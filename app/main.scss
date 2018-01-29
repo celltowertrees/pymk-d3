@@ -1,0 +1,60 @@
+@import 'colors';
+
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+.bar {
+  fill: steelblue;
+}
+
+.axis {
+  text {
+    fill: #000;
+    font: 10px sans-serif;
+  }
+
+  path, line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  path {
+    display: none;
+  }
+}
+
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* aspect ratio */
+    vertical-align: top;
+    overflow: hidden;
+}
+.svg-content-responsive {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 0;
+}
+
+#viz {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+
+  rect {
+    fill: steelblue;
+  }
+
+  text {
+    font: 10px sans-serif;
+    text-anchor: end;
+  }
+}

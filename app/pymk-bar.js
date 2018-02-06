@@ -7,6 +7,7 @@ export default function () {
   // Y: numNew, scaled down to fit the graph viewport, but y still tells you the number of occurrences (?)
 
   // important for parsing dates of scrapes
+  // also, this is not even a valid function
   const parseDate = d3.timeFormat('%Y-%m-%d').parse;
 
   // ----------------------- SETTINGS
@@ -29,11 +30,12 @@ export default function () {
     .range([height, 0]);
 
   const xAxis = d3.axisBottom(x)
-    .scale(x);
+    .scale(x)
+    .tickFormat(d3.timeFormat("%m-%d"));
 
   const yAxis = d3.axisLeft(y)
     .scale(y)
-    .ticks(10, '%');
+    .ticks(10);
 
   // ----------------------- CREATE CHART CONTAINER
 
@@ -49,9 +51,10 @@ export default function () {
 
     // do we want to use domain here?
     // how is timestamp used to map the domain or range or whatever?
-    x.domain(data.map(d => d.timestamp));
-    y.domain([0, d3.max(data, d => d.numNew)]);
-
+    x.domain(data.map(d => new Date(d.timestamp)));
+    y.domain([0, d3.max(data, d => {
+      return parseFloat(d.numNew);
+    })]);
 
     // begin appending elements to the chart
 
@@ -77,7 +80,7 @@ export default function () {
       .data(data)
       .enter().append('rect')
       .attr('class', 'bar')
-      .attr('x', d => x(d.timestamp))
+      .attr('x', d => x(new Date(d.timestamp)))
       .attr('y', d => y(d.numNew))
       .attr('height', d => height - y(d.numNew))
       .attr('width', x.bandwidth() - 5);

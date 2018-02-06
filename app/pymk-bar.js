@@ -6,10 +6,6 @@ export default function () {
   // X: timestamp
   // Y: numNew, scaled down to fit the graph viewport, but y still tells you the number of occurrences (?)
 
-  // important for parsing dates of scrapes
-  // also, this is not even a valid function
-  const parseDate = d3.timeFormat('%Y-%m-%d').parse;
-
   // ----------------------- SETTINGS
   const margin = {
     top: 20,
@@ -18,13 +14,13 @@ export default function () {
     left: 40
   },
   // an onResize function would be useful at some point
-  width = 700 - margin.left - margin.right,
-  height = 500 - margin.top - margin.bottom;
+  width = 1000 - margin.left - margin.right,
+  height = 600 - margin.top - margin.bottom;
 
   // ----------------------- AXES DEFINITIONS
 
   const x = d3.scaleBand()
-    .rangeRound([0, width], .1);
+    .rangeRound([0, width], .05);
 
   const y = d3.scaleLinear()
     .range([height, 0]);
@@ -47,11 +43,14 @@ export default function () {
 
   // ----------------------- BUILD CHART FROM DATA
 
-  d3.csv('data/pymk-inspector-sessions.csv', (error, data) => {
+  d3.csv('data/pymk-inspector-sessions.csv', (error, res) => {
 
-    // do we want to use domain here?
-    // how is timestamp used to map the domain or range or whatever?
-    x.domain(data.map(d => new Date(d.timestamp)));
+    const data = res.sort((a, b) => {
+      return Date.parse(a.timestamp) - Date.parse(b.timestamp);
+    });
+
+    x.domain(data.map(d => Date.parse(d.timestamp)));
+
     y.domain([0, d3.max(data, d => {
       return parseFloat(d.numNew);
     })]);
@@ -62,7 +61,10 @@ export default function () {
     chart.append('g')
       .attr('class', 'x axis')
       .attr('transform', `translate(0, ${height})`)
-      .call(xAxis);
+      .call(xAxis)
+      .selectAll('text')
+      .style('text-anchor', 'end')
+      .attr('transform', 'rotate(-65)');
 
     // axis y
     chart.append('g')
@@ -80,7 +82,7 @@ export default function () {
       .data(data)
       .enter().append('rect')
       .attr('class', 'bar')
-      .attr('x', d => x(new Date(d.timestamp)))
+      .attr('x', d => x(Date.parse(d.timestamp)))
       .attr('y', d => y(d.numNew))
       .attr('height', d => height - y(d.numNew))
       .attr('width', x.bandwidth() - 5);
